@@ -16,26 +16,41 @@ int main(int argc, char *argv[]) {
 
     const int steps = 100;
     int pos = 50;
-    int count = 0;
+    int count_p1 = 0;
+    int count_p2 = 0;
 
     char rot;
     int dist;
     while (fscanf(f, " %c%d", &rot, &dist) == 2) {
         switch (rot) {
             case 'R':
-                pos = (pos + dist) % steps;
+                pos += dist;
+                if (pos >= steps) {
+                    count_p2 += pos / steps;
+                    pos = pos % steps;
+                }
                 break;
             case 'L':
-                pos = (((pos - dist) % steps) + steps) % steps;
+                pos -= dist;
+                if (pos <= 0) {
+                    count_p2 += abs(pos - steps) / steps;
+                    // TODO: There is probably a smarter way to avoid double
+                    // counting when the dial starts at zero
+                    if (pos + dist == 0) {
+                        count_p2--;
+                    }
+                    pos = ((pos % steps) + steps) % steps;
+                }
                 break;
         }
         if (pos == 0) {
-            count++;
+            count_p1++;
         }
     }
 
     printf("--- Day 1: Secret Entrance ---\n");
-    printf("Answer for part 1: %d\n", count);
+    printf("Answer for part 1: %d\n", count_p1);
+    printf("Answer for part 2: %d\n", count_p2);
 
     fclose(f);
 }
