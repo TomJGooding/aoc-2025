@@ -25,9 +25,10 @@ int main(int argc, char *argv[]) {
 
     fclose(f);
 
-    long grand_total = 0;
-
     char *ops_line = lines[lines_read - 1];
+
+    long grand_total_p1 = 0;
+
     for (size_t x = 0; ops_line[x]; x++) {
         if (ops_line[x] == '+' || ops_line[x] == '*') {
             char op = ops_line[x];
@@ -40,10 +41,38 @@ int main(int argc, char *argv[]) {
                 }
             }
 
-            grand_total += total;
+            grand_total_p1 += total;
+        }
+    }
+
+    long grand_total_p2 = 0;
+
+    /*
+     * This might not be the most efficient solution, but it avoids
+     * trying to parse the problems from right-to-left!
+     */
+    size_t op_idx = 0;
+    for (size_t ox = 1; ops_line[ox]; ox++) {
+        if (ops_line[ox] == '+' || ops_line[ox] == '*' || ops_line[ox] == '\n') {
+            long total = (ops_line[op_idx] == '*') ? 1 : 0;
+
+            size_t col_end = (ops_line[ox] == '\n') ? ox : ox - 1;
+            for (size_t nx = op_idx; nx < col_end; nx++) {
+                char num_str[MAX_LINES];
+                for (size_t y = 0; y < lines_read; y++) {
+                    num_str[y] = lines[y][nx];
+                }
+                num_str[lines_read] = 0;
+                int num = atoi(num_str);
+                total = (ops_line[op_idx] == '*') ? total * num : total + num;
+            }
+
+            grand_total_p2 += total;
+            op_idx = ox;
         }
     }
 
     printf("--- Day 6: Trash Compactor ---\n");
-    printf("Answer for part 1: %ld\n", grand_total);
+    printf("Answer for part 1: %ld\n", grand_total_p1);
+    printf("Answer for part 2: %ld\n", grand_total_p2);
 }
